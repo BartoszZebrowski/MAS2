@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MAS2.Models
+﻿namespace MAS2
 {
-    public class Customer
+    public class Customer : IDisposable
     {
         public string FullName { get; set; }
         private List<Rent> Rents { get; set; } = new();
@@ -16,10 +10,18 @@ namespace MAS2.Models
             FullName = fullName;
         }
 
+        public void Dispose()
+        {
+            foreach (var rent in Rents)
+            {
+                RemoveRent(rent, true);
+            }
+        }
+
         public void AddCarRent(Car car, int days) => new Rent(this, car, DateTime.Now, DateTime.Now.AddDays(days));
         public void AddRent(Rent rent) => Rents.Add(rent);
-        public IEnumerable<Rent> GetRents() => Rents;
-        public IEnumerable<Car> GetCars() => Rents.Select(rent => rent.Car);
+        public IReadOnlyCollection<Rent> GetRents() => Rents;
+        public IReadOnlyCollection<Car> GetCars() => Rents.Select(rent => rent.Car).ToList();
 
         public void RemoveRent(Rent rent, bool twoSide = true)
         {
@@ -28,5 +30,6 @@ namespace MAS2.Models
             else
                 Rents.Remove(rent);
         }
+
     }
 }

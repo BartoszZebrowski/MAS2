@@ -1,14 +1,16 @@
-﻿namespace MAS2.Models
+﻿namespace MAS2
 {
     public class Car : IDisposable
     {
         private static List<Wheel> AllWheels = new();
 
-        public Brand Brand { get; private set; } // assocjacja kwalifikowana po numerze VIN (tyko z drugiej strony)
-        private List<Wheel> Wheels { get; set; } = new(); // kompozycja
-        private List<Rent> Rents { get; set; } = new();// assocjacja z atrybutem
-        private string Model { get; set; }
-        private DateOnly ProductionDate { get; set; }
+
+        public Company Company { get; private set; }
+        public Brand Brand { get; private set; }
+        private List<Wheel> Wheels { get; set; } = new();
+        private List<Rent> Rents { get; set; } = new();
+        public string Model { get; set; }
+        public DateOnly ProductionDate { get; set; }
 
         public Car(string model, DateOnly productionDate)
         {
@@ -19,11 +21,33 @@
         public void Dispose()
         {
             foreach (var wheel in Wheels)
+            {
                 AllWheels.Remove(wheel);
+                wheel.RemoveCar();
+            }
+
+            foreach (var rent in Rents)
+            {
+                RemoveRent(rent, true);
+            }
+
+            Brand.RemoveCar(this);
+            Company.RemoveCar(this);
         }
+
+        public void SetCompany(Company company)
+        {
+            Company = company;
+            Company.AddCar(this);
+        }
+
+        public void RemoveCompany() => Company = null;
 
         public void AddMark(string VIN, Brand brand)
         {
+            if (Brand == brand)
+                return;
+
             Brand = brand;
             brand.AddCar(VIN, this);
         }

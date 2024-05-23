@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MAS2.Models
+﻿namespace MAS2
 {
-    public class Brand
+    public class Brand : IDisposable
     {
-        private Dictionary<string, Car> Cars { get; set; } = new (); // asocjacja z kwalifikatorem po numerze VIN samochodu
+        private Dictionary<string, Car> Cars { get; set; } = new ();
         public string Name { get; set; }
         public string Country { get; set; }
 
@@ -20,8 +14,9 @@ namespace MAS2.Models
 
         public void AddCar(string VIN, Car car)
         {
-            if (Cars.ContainsKey(VIN) || Cars[VIN] == car)
-                throw new Exception("Ten VIN z samochodem juz istnieje");
+            if (Cars.ContainsKey(VIN))
+                if (Cars[VIN] == car)
+                    throw new Exception("Ten VIN z samochodem juz istnieje");
 
             Cars.Add(VIN, car);
         }
@@ -36,5 +31,18 @@ namespace MAS2.Models
                 Cars.Remove(key);
         }
 
+        public Car GetCarByVin(string VIN)
+        {
+            Cars.TryGetValue(VIN, out var car);
+            return car;
+        }
+
+        public void Dispose()
+        {
+            foreach (var car in Cars.Values)
+            {
+                car.RemoveBrand();
+            }
+        }
     }
 }

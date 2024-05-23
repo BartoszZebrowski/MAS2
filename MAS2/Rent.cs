@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MAS2.Models
+﻿namespace MAS2
 {
     public class Rent
     {
-        public Customer Customer { get; set; }
-        public Car Car { get; set; }
+        public Customer Customer { get; private set; }
+        public Car Car { get; private set; }
         public DateTime DateFrom { get; set; }
         public DateTime DateTo { get; set; }
 
